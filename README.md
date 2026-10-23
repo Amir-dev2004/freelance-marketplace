@@ -17,4 +17,5 @@
 
 **لینک‌های پروژه:**
 https://devfrontiers.atlassian.net/jira/software/projects/KAN/boards/2?filter=&groupBy=none
+
 https://github.com/Amir-dev2004/freelance-marketplace/pull/1
