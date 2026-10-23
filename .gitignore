@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Environment variables (اطلاعات حساس مثل رمز دیتابیس)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE and Editor files (تنظیمات شخصی ادیتور شما)
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS generated files (فایل‌های سیستمی مک و ویندوز)
+.DS_Store
+Thumbs.db
+
+# Logs (فایل‌های لاگ)
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build files (فایل‌های کامپایل شده)
+dist/
+build/
