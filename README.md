@@ -13,7 +13,7 @@
 - **ادمین (Admin):** مدیریت کاربران و نظارت بر سیستم.
 
 **سیستم مدیریت پایگاه داده (DBMS):**
-- PostgreSQL
+- Microsoft SQL Server (SSMS)
 
 **لینک‌های پروژه:**
 https://devfrontiers.atlassian.net/jira/software/projects/KAN/boards/2?filter=&groupBy=none
