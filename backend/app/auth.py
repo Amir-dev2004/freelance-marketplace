@@ -1,3 +1,4 @@
+from sqlalchemy.exc import IntegrityError
 from datetime import datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -179,7 +180,7 @@ def signup(
     if data.password != data.confirm_password:
         raise HTTPException(
             status_code=400,
-            detail="Passwords do not match"
+            detail="رمزهای عبور مطابقت ندارند."
         )
 
     # بررسی نقش‌های انتخاب‌شده
@@ -188,18 +189,19 @@ def signup(
     if not data.roles or not set(data.roles).issubset(allowed_roles):
         raise HTTPException(
             status_code=400,
-            detail="Invalid roles"
+            detail="نقش انتخاب‌شده معتبر نیست."
         )
 
-    # بررسی تکراری نبودن ایمیل
+    # بررسی تکراری بودن حساب
     existing_user = db.query(User).filter(
-        User.email == data.email
+        (User.email == data.email) |
+        (User.codemeli == data.codemeli)
     ).first()
 
     if existing_user:
         raise HTTPException(
             status_code=409,
-            detail="Email already registered"
+            detail="این حساب از قبل وجود دارد."
         )
 
     # ساخت کاربر جدید
@@ -212,18 +214,26 @@ def signup(
         password_hash=hash_password(data.password)
     )
 
-    db.add(new_user)
-    db.flush()
+    try:
+        db.add(new_user)
+        db.flush()
 
-    # ذخیره نقش‌های کاربر
-    for role in set(data.roles):
-        db.add(UserRole(
-            user_id=new_user.id,
-            role=role
-        ))
+        # ذخیره نقش‌های کاربر
+        for role in set(data.roles):
+            db.add(UserRole(
+                user_id=new_user.id,
+                role=role
+            ))
 
-    db.commit()
-    db.refresh(new_user)
+        db.commit()
+        db.refresh(new_user)
+
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=409,
+            detail="این حساب از قبل وجود دارد."
+        )
 
     return {
         "message": "Registration successful",
@@ -266,7 +276,7 @@ def forgot_password(
     db.commit()
 
     # نمایش لینک در ترمینال برای محیط توسعه
-    reset_link = f"http://127.0.0.1:8000/reset-password?token={token}"
+    reset_link = f"http://127.0.0.1:5500/frontend/reset-password.html?token={token}"
     print(f"Password reset link: {reset_link}")
 
     return response

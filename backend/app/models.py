@@ -31,11 +31,11 @@ class User(Base):
     )
 
     created_at = Column(
-        "CreatedAt",
-        DateTime,
-        nullable=False,
-        server_default=func.sysdatetime()
-    )
+    "CreatedAt",
+    DateTime,
+    nullable=False,
+    server_default=func.getutcdate()
+)
 
     updated_at = Column(
         "UpdatedAt",
