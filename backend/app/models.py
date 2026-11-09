@@ -57,3 +57,18 @@ class AdminAccount(Base):
 
     user_id = Column("UserId", Integer, ForeignKey("user.id"), primary_key=True)
     granted_at = Column("GrantedAt", DateTime, nullable=False)
+
+class PasswordResetToken(Base):
+    __tablename__ = "PasswordResetTokens"
+
+    id = Column("Id", Integer, primary_key=True)
+    user_id = Column("UserId", Integer, ForeignKey("user.id"), nullable=False)
+    token_hash = Column("TokenHash", String(64), nullable=False, unique=True)
+    expires_at = Column("ExpiresAt", DateTime, nullable=False)
+    used_at = Column("UsedAt", DateTime, nullable=True)
+    created_at = Column(
+        "CreatedAt",
+        DateTime,
+        nullable=False,
+        server_default=func.sysdatetime()
+    )

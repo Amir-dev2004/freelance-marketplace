@@ -1,12 +1,22 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import User, UserRole, AdminAccount
-from app.schemas import LoginRequest, SignupRequest
-from app.security import verify_password, hash_password
+from app.models import User, UserRole, AdminAccount, PasswordResetToken
+from app.schemas import (
+    LoginRequest,
+    SignupRequest,
+    ForgotPasswordRequest,
+    ResetPasswordRequest
+)
+from app.security import (
+    verify_password,
+    hash_password,
+    generate_reset_token,
+    hash_reset_token
+)
 router = APIRouter()
 
 
@@ -223,4 +233,88 @@ def signup(
             "email": new_user.email
         },
         "roles": list(set(data.roles))
+    }
+
+@router.post("/forgot-password")
+def forgot_password(
+    data: ForgotPasswordRequest,
+    db: Session = Depends(get_db)
+):
+    user = db.query(User).filter(
+        User.email == data.email
+    ).first()
+
+    # پیام یکسان برای جلوگیری از افشای وجود ایمیل
+    response = {
+        "message": "If the email exists, a reset link has been generated."
+    }
+
+    if not user:
+        return response
+
+    # ساخت توکن تصادفی
+    token = generate_reset_token()
+
+    # ذخیره هش توکن در دیتابیس
+    reset_record = PasswordResetToken(
+        user_id=user.id,
+        token_hash=hash_reset_token(token),
+        expires_at=datetime.utcnow() + timedelta(minutes=15)
+    )
+
+    db.add(reset_record)
+    db.commit()
+
+    # نمایش لینک در ترمینال برای محیط توسعه
+    reset_link = f"http://127.0.0.1:8000/reset-password?token={token}"
+    print(f"Password reset link: {reset_link}")
+
+    return response
+
+@router.post("/reset-password")
+def reset_password(
+    data: ResetPasswordRequest,
+    db: Session = Depends(get_db)
+):
+    # بررسی تطابق رمزهای عبور
+    if data.new_password != data.confirm_password:
+        raise HTTPException(
+            status_code=400,
+            detail="Passwords do not match"
+        )
+
+    # پیدا کردن توکن معتبر
+    reset_record = db.query(PasswordResetToken).filter(
+        PasswordResetToken.token_hash == hash_reset_token(data.token),
+        PasswordResetToken.used_at.is_(None),
+        PasswordResetToken.expires_at > datetime.utcnow()
+    ).first()
+
+    if not reset_record:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid or expired reset token"
+        )
+
+    # پیدا کردن کاربر
+    user = db.query(User).filter(
+        User.id == reset_record.user_id
+    ).first()
+
+    if not user:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid reset token"
+        )
+
+    # تغییر رمز عبور
+    user.password_hash = hash_password(data.new_password)
+
+    # یک‌بارمصرف کردن توکن
+    reset_record.used_at = datetime.utcnow()
+
+    db.commit()
+
+    return {
+        "message": "Password reset successful"
     }

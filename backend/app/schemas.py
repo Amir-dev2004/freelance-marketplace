@@ -5,7 +5,7 @@ from pydantic import BaseModel
 class LoginRequest(BaseModel):
     email: str
     password: str
-    
+
 class SignupRequest(BaseModel):
     name: str
     phone: str | None = None
@@ -15,3 +15,12 @@ class SignupRequest(BaseModel):
     password: str
     confirm_password: str
     roles: list[str]
+
+class ForgotPasswordRequest(BaseModel):
+    email: str
+
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str
+    confirm_password: str
