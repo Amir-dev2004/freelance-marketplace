@@ -1,0 +1,36 @@
+import os
+from dotenv import load_dotenv
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
+
+load_dotenv()
+
+DB_SERVER = os.getenv("DB_SERVER")
+DB_NAME = os.getenv("DB_NAME")
+DB_DRIVER = os.getenv("DB_DRIVER")
+
+connection_string = (
+    f"mssql+pyodbc://@{DB_SERVER}/{DB_NAME}"
+    f"?driver={DB_DRIVER.replace(' ', '+')}"
+    "&trusted_connection=yes"
+)
+
+engine = create_engine(
+    connection_string,
+    pool_pre_ping=True
+)
+
+SessionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine
+)
+
+Base = declarative_base()
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

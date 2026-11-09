@@ -31,3 +31,7 @@ yarn-error.log*
 # Build files (فایل‌های کامپایل شده)
 dist/
 build/
+# Python
+.venv/
+__pycache__/
+*.py[cod]
