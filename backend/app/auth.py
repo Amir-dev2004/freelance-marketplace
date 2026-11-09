@@ -1,12 +1,12 @@
+from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import User, UserRole, AdminAccount
-from app.schemas import LoginRequest
-from app.security import verify_password
-
+from app.schemas import LoginRequest, SignupRequest
+from app.security import verify_password, hash_password
 router = APIRouter()
 
 
@@ -159,4 +159,68 @@ def admin_test(
     return {
         "message": "Welcome Admin",
         "user": user.name
+    }
+@router.post("/signup")
+def signup(
+    data: SignupRequest,
+    db: Session = Depends(get_db)
+):
+    # بررسی تطابق رمز عبور
+    if data.password != data.confirm_password:
+        raise HTTPException(
+            status_code=400,
+            detail="Passwords do not match"
+        )
+
+    # بررسی نقش‌های انتخاب‌شده
+    allowed_roles = {"Client", "Freelancer"}
+
+    if not data.roles or not set(data.roles).issubset(allowed_roles):
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid roles"
+        )
+
+    # بررسی تکراری نبودن ایمیل
+    existing_user = db.query(User).filter(
+        User.email == data.email
+    ).first()
+
+    if existing_user:
+        raise HTTPException(
+            status_code=409,
+            detail="Email already registered"
+        )
+
+    # ساخت کاربر جدید
+    new_user = User(
+        name=data.name,
+        phone=data.phone,
+        address=data.address,
+        email=data.email,
+        codemeli=data.codemeli,
+        password_hash=hash_password(data.password)
+    )
+
+    db.add(new_user)
+    db.flush()
+
+    # ذخیره نقش‌های کاربر
+    for role in set(data.roles):
+        db.add(UserRole(
+            user_id=new_user.id,
+            role=role
+        ))
+
+    db.commit()
+    db.refresh(new_user)
+
+    return {
+        "message": "Registration successful",
+        "user": {
+            "id": new_user.id,
+            "name": new_user.name,
+            "email": new_user.email
+        },
+        "roles": list(set(data.roles))
     }

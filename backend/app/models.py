@@ -1,4 +1,13 @@
-from sqlalchemy import Column, Integer, String, Unicode, DateTime, ForeignKey
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    Unicode,
+    DateTime,
+    ForeignKey,
+    func
+)
+
 from app.database import Base
 
 
@@ -6,19 +15,34 @@ class User(Base):
     __tablename__ = "user"
 
     id = Column(Integer, primary_key=True)
-    name = Column(Unicode(50), nullable=False)
+    name = Column(Unicode(100), nullable=False)
     phone = Column(String(50), nullable=True)
-    address = Column(Unicode(250), nullable=False)
+    address = Column(Unicode(500), nullable=False)
     email = Column(String(100), nullable=False)
     codemeli = Column(String(20), nullable=False)
 
     password_hash = Column("PasswordHash", Unicode(255), nullable=False)
-    account_status = Column("AccountStatus", String(10), nullable=False)
 
-    created_at = Column("CreatedAt", DateTime, nullable=False)
-    updated_at = Column("UpdatedAt", DateTime, nullable=False)
+    account_status = Column(
+        "AccountStatus",
+        String(10),
+        nullable=False,
+        server_default="Active"
+    )
 
-    from sqlalchemy import ForeignKey
+    created_at = Column(
+        "CreatedAt",
+        DateTime,
+        nullable=False,
+        server_default=func.sysdatetime()
+    )
+
+    updated_at = Column(
+        "UpdatedAt",
+        DateTime,
+        nullable=False,
+        server_default=func.sysdatetime()
+    )
 
 
 class UserRole(Base):
