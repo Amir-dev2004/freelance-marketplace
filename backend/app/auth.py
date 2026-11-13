@@ -269,7 +269,7 @@ def forgot_password(
     reset_record = PasswordResetToken(
         user_id=user.id,
         token_hash=hash_reset_token(token),
-        expires_at=datetime.utcnow() + timedelta(minutes=15)
+        expires_at=datetime.utcnow() + timedelta(minutes=1)
     )
 
     db.add(reset_record)

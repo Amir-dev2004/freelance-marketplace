@@ -29,9 +29,9 @@ class SignupRequest(BaseModel):
     def validate_email(cls, value):
         value = value.strip()
 
-        pattern = r"^[\w.+-]+@[\w-]+(?:\.[\w-]+)+$"
+        pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*\.com$"
 
-        if not re.match(pattern, value):
+        if not re.fullmatch(pattern, value):
             raise ValueError("ایمیل معتبر نیست.")
 
         return value
