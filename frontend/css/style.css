@@ -1,0 +1,283 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --primary: #7656e8;
+    --primary-dark: #6342d2;
+    --background: #f7f7fc;
+    --surface: #ffffff;
+    --text: #25243a;
+    --muted: #89889b;
+    --border: #e9e8f0;
+    --danger: #e5484d;
+    --radius: 14px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Vazirmatn', sans-serif;
+    background: var(--background);
+    color: var(--text);
+    min-height: 100vh;
+}
+
+button,
+input {
+    font-family: inherit;
+}
+
+a {
+    text-decoration: none;
+    color: var(--primary);
+    font-weight: 600;
+}
+
+a:hover {
+    color: var(--primary-dark);
+}
+
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 32px 16px;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 440px;
+    background: var(--surface);
+    padding: 40px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: 0 12px 40px rgba(40, 30, 90, 0.05);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 35px;
+}
+
+.brand-icon {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary);
+    color: white;
+    border-radius: 12px;
+    font-size: 23px;
+    font-weight: 800;
+}
+
+.brand h1 {
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.auth-heading {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.auth-heading h2 {
+    font-size: 24px;
+    margin-bottom: 9px;
+}
+
+.auth-heading p {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.9;
+}
+
+.form-group {
+    margin-bottom: 22px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 9px;
+}
+
+.form-group input {
+    width: 100%;
+    height: 48px;
+    padding: 0 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    outline: none;
+    font-size: 13px;
+    background: #fff;
+    transition: 0.2s;
+}
+
+.form-group input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(118, 86, 232, 0.10);
+}
+
+.form-group input::placeholder {
+    color: #b2b1bf;
+}
+
+.password-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.password-label a {
+    font-size: 12px;
+}
+
+.password-input {
+    position: relative;
+}
+
+.password-input input {
+    padding-left: 65px;
+}
+
+.toggle-password {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    color: var(--primary);
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.submit-btn {
+    width: 100%;
+    height: 49px;
+    border: none;
+    border-radius: var(--radius);
+    background: var(--primary);
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.submit-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+.submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 25px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.auth-footer a {
+    margin-right: 4px;
+}
+
+.page-footer {
+    margin-top: 25px;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.message {
+    padding: 12px;
+    margin-bottom: 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+.message.error {
+    color: var(--danger);
+    background: #fff0f0;
+    border: 1px solid #ffdada;
+}
+
+.message.success {
+    color: #16834b;
+    background: #edfff5;
+    border: 1px solid #c9f3dc;
+}
+
+@media (max-width: 480px) {
+    .auth-card {
+        padding: 28px 22px;
+    }
+
+    .auth-heading h2 {
+        font-size: 21px;
+    }
+}
+
+/* Signup page */
+
+.role-options {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.role-option {
+    flex: 1;
+    display: flex !important;
+    align-items: center;
+    gap: 9px;
+    padding: 13px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 13px !important;
+    transition: 0.2s;
+}
+
+.role-option:has(input:checked) {
+    border-color: var(--primary);
+    background: #f7f4ff;
+    color: var(--primary);
+}
+
+.role-option input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--primary);
+    cursor: pointer;
+}
+
+.field-hint {
+    display: block;
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+@media (max-width: 480px) {
+    .role-options {
+        flex-direction: column;
+    }
+}

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ثبت‌نام | Freelancer Marketplace</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <main class="auth-container">
+        <section class="auth-card">
+
+            <div class="brand">
+                <div class="brand-icon">F</div>
+                <h1>Freelancer</h1>
+            </div>
+
+            <div class="auth-heading">
+                <h2>ایجاد حساب کاربری</h2>
+                <p>برای عضویت در سایت فریلنسر، اطلاعات زیر رو تکمیل کن.</p>
+            </div>
+
+            <form id="signupForm">
+
+                <div class="form-group">
+                    <label for="name">نام و نام خانوادگی</label>
+                    <input type="text" id="name" name="name" placeholder="نام کامل خود را وارد کن" autocomplete="name"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">ایمیل</label>
+                    <input type="email" id="email" name="email" placeholder="example@email.com" autocomplete="email"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">شماره موبایل (اختیاری)</label>
+                    <input type="tel" id="phone" name="phone" placeholder="09123456789" autocomplete="tel">
+                </div>
+
+                <div class="form-group">
+                    <label for="codemeli">کد ملی</label>
+                    <input type="text" id="codemeli" name="codemeli" placeholder="کد ملی ۱۰ رقمی" inputmode="numeric"
+                        maxlength="10" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">آدرس</label>
+                    <input type="text" id="address" name="address" placeholder="آدرس محل سکونت"
+                        autocomplete="street-address" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">رمز عبور</label>
+                    <div class="password-input">
+                        <input type="password" id="password" name="password" placeholder="رمز عبور خود را وارد کن"
+                            autocomplete="new-password" required>
+                        <button type="button" class="toggle-password" data-target="password"
+                            aria-label="نمایش رمز عبور">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">تکرار رمز عبور</label>
+                    <div class="password-input">
+                        <input type="password" id="confirmPassword" name="confirmPassword"
+                            placeholder="رمز عبور را دوباره وارد کن" autocomplete="new-password" required>
+                        <button type="button" class="toggle-password" data-target="confirmPassword"
+                            aria-label="نمایش رمز عبور">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>نوع حساب کاربری</label>
+
+                    <div class="role-options">
+                        <label class="role-option">
+                            <input type="checkbox" name="roles" value="Client">
+                            کارفرما
+                        </label>
+
+                        <label class="role-option">
+                            <input type="checkbox" name="roles" value="Freelancer">
+                            فریلنسر
+                        </label>
+                    </div>
+
+                    <small class="field-hint">
+                        می‌تونی هر دو نقش رو انتخاب کنی.
+                    </small>
+                </div>
+
+                <div id="signupMessage" class="message" hidden></div>
+
+                <button type="submit" class="submit-btn" id="signupButton">
+                    ایجاد حساب کاربری
+                </button>
+
+            </form>
+
+            <div class="auth-footer">
+                قبلاً ثبت‌نام کردی؟
+                <a href="index.html">وارد شو</a>
+            </div>
+
+        </section>
+
+        <footer class="page-footer">
+            Freelancer Marketplace
+        </footer>
+    </main>
+
+    <script src="js/auth.js"></script>
+</body>
+
+</html>
