@@ -18,8 +18,66 @@ from app.security import (
     generate_reset_token,
     hash_reset_token
 )
+from collections import defaultdict, deque
+from threading import Lock
+import time
 router = APIRouter()
 
+# Login rate limit settings
+MAX_LOGIN_ATTEMPTS = 5
+LOGIN_WINDOW_SECONDS = 300
+LOGIN_BLOCK_SECONDS = 300
+
+login_attempts = defaultdict(deque)
+login_blocked_until = {}
+login_rate_limit_lock = Lock()
+
+
+def get_client_ip(request: Request):
+    if request.client:
+        return request.client.host
+    return "unknown"
+
+
+def check_login_rate_limit(ip: str):
+    now = time.monotonic()
+
+    with login_rate_limit_lock:
+        blocked_until = login_blocked_until.get(ip, 0)
+
+        if now < blocked_until:
+            remaining = int(blocked_until - now) + 1
+            raise HTTPException(
+                status_code=429,
+                detail=f"Too Many Requests. Try again in {remaining} seconds."
+            )
+
+        attempts = login_attempts[ip]
+
+        while attempts and now - attempts[0] >= LOGIN_WINDOW_SECONDS:
+            attempts.popleft()
+
+
+def record_failed_login(ip: str):
+    now = time.monotonic()
+
+    with login_rate_limit_lock:
+        attempts = login_attempts[ip]
+
+        while attempts and now - attempts[0] >= LOGIN_WINDOW_SECONDS:
+            attempts.popleft()
+
+        attempts.append(now)
+
+        if len(attempts) >= MAX_LOGIN_ATTEMPTS:
+            login_blocked_until[ip] = now + LOGIN_BLOCK_SECONDS
+            attempts.clear()
+
+
+def clear_login_attempts(ip: str):
+    with login_rate_limit_lock:
+        login_attempts.pop(ip, None)
+        login_blocked_until.pop(ip, None)
 
 @router.post("/login")
 def login(
@@ -27,6 +85,57 @@ def login(
     request: Request,
     db: Session = Depends(get_db)
 ):
+    ip = get_client_ip(request)
+
+    # Check rate limit before processing login
+    check_login_rate_limit(ip)
+
+    user = db.query(User).filter(User.email == data.email).first()
+
+    # Record failed login attempt
+    if not user or not verify_password(data.password, user.password_hash):
+        record_failed_login(ip)
+
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid email or password"
+        )
+
+    # Clear failed attempts after correct credentials
+    clear_login_attempts(ip)
+
+    if user.account_status.lower() != "active":
+        raise HTTPException(
+            status_code=403,
+            detail="Your account is not active"
+        )
+
+    roles = [
+        role.role
+        for role in db.query(UserRole).filter(
+            UserRole.user_id == user.id
+        ).all()
+    ]
+
+    is_admin = db.query(AdminAccount).filter(
+        AdminAccount.user_id == user.id
+    ).first()
+
+    if is_admin:
+        roles.append("Admin")
+
+    request.session.clear()
+    request.session["user_id"] = user.id
+
+    return {
+        "message": "Login successful",
+        "user": {
+            "id": user.id,
+            "name": user.name,
+            "email": user.email
+        },
+        "roles": roles
+    }
     user = db.query(User).filter(User.email == data.email).first()
 
     if not user or not verify_password(data.password, user.password_hash):
@@ -269,7 +378,7 @@ def forgot_password(
     reset_record = PasswordResetToken(
         user_id=user.id,
         token_hash=hash_reset_token(token),
-        expires_at=datetime.utcnow() + timedelta(minutes=1)
+        expires_at=datetime.utcnow() + timedelta(minutes=15)
     )
 
     db.add(reset_record)
