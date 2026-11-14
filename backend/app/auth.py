@@ -23,6 +23,28 @@ from threading import Lock
 import time
 router = APIRouter()
 
+def validate_password_strength(password: str):
+    if len(password) < 8 or not any(
+        "A" <= char <= "Z" or "a" <= char <= "z"
+        for char in password
+    ):
+        raise HTTPException(
+            status_code=422,
+            detail="Password must be at least 8 characters and contain at least one English letter."
+        )
+
+    if any(
+        "\u0600" <= char <= "\u06FF"
+        or "\u0750" <= char <= "\u077F"
+        or "\u08A0" <= char <= "\u08FF"
+        for char in password
+    ):
+        raise HTTPException(
+            status_code=422,
+            detail="Persian and Arabic characters are not allowed in passwords."
+        )
+
+
 # Login rate limit settings
 MAX_LOGIN_ATTEMPTS = 5
 LOGIN_WINDOW_SECONDS = 300
@@ -285,6 +307,8 @@ def signup(
     data: SignupRequest,
     db: Session = Depends(get_db)
 ):
+    validate_password_strength(data.password)
+
     # بررسی تطابق رمز عبور
     if data.password != data.confirm_password:
         raise HTTPException(
@@ -395,6 +419,8 @@ def reset_password(
     data: ResetPasswordRequest,
     db: Session = Depends(get_db)
 ):
+    validate_password_strength(data.new_password)
+
     # بررسی تطابق رمزهای عبور
     if data.new_password != data.confirm_password:
         raise HTTPException(
