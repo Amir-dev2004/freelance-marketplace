@@ -1,10 +1,12 @@
-
+﻿
 from fastapi import FastAPI
 from starlette.middleware.sessions import SessionMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.auth import router as auth_router
+from app.projects import router as projects_router
+from app.profile import router as profile_router
 
 app = FastAPI(title="Freelancer Marketplace API")
 
@@ -26,10 +28,12 @@ app.add_middleware(
 )
 
 app.include_router(auth_router)
-
+app.include_router(projects_router)
+app.include_router(profile_router)
 
 @app.get("/")
 def root():
     return {
         "message": "Freelancer Marketplace API is running"
     }
+
